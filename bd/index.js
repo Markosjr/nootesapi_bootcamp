@@ -12,6 +12,9 @@ const options = {
 const sequelize = new Sequelize (options);
 sequelize.authenticate().then(() => {
     console.log("Conectado ao Banco" + options.database)
+}).catch(erro => {
+    console.log("Erro ao se conectar ao banco" + options.database)
+    console.log(erro);
 });
 
 

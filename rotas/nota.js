@@ -1,9 +1,11 @@
 const {Router} = require("express");
 const router = Router();
 
-router.get("/:id?",  (req, res) =>{
-      if (req.params.id) {
-         res.send("Nota ID " + req.params.id);
+router.get("/:id?",  (req, res) => {
+   const { id } = req.params;
+
+      if (id) {
+         res.send("Nota ID " + id);
       } else {
          res.send("Todas as notas");
       }

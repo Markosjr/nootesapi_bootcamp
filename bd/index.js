@@ -6,7 +6,7 @@ const options = {
     password: "notes123",
     database: "notes",
     dialect: "mysql",
-    host: "notes.cnotes.cgssmrnlwpdu.us-east-2.rds.amazonaws.comgssm",
+    host: "notes.cgssmrnlwpdu.us-east-2.rds.amazonaws.com",
 };
 
 const sequelize = new Sequelize (options);
@@ -18,3 +18,5 @@ sequelize.authenticate().then(() => {
 });
 
 
+bd.Sequelize = Sequelize;
+module.exports = bd;

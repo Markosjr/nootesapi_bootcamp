@@ -7,12 +7,17 @@ router.get("/:id?", async (req, res) =>{
    let resultado;
 
    if (req.params.id) {
-      [resultado] = await Usuario.FindAll({
-         where: {
-            id: req.params.id,
-         },
-      });
+      console.log("Buscando usando findAll + where");
+     // [resultado] = await Usuario.FindAll({
+       //  where: {
+           // id: req.params.id,
+       //  },
+     // }); 
+      console.log ("Buscando usando findByPk");
+      resultado = await Usuario.findByPk(req.params.id);
 
+      console.log("Buscando usando findOne");
+      
    } else {
       resultado = await Usuario.FindAll();
    }

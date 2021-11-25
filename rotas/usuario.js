@@ -3,8 +3,22 @@ const {Usuario} = require('../bd')
 
 const router = Router();
 
-router.get("/",  (req, res) =>{
-       res.send([]);
+router.get("/:id?", async (req, res) =>{
+   let resultado;
+
+   if (req.params.id) {
+      [resultado] = await Usuario.FindAll({
+         where: {
+            id: req.params.id,
+         },
+      });
+
+   } else {
+      resultado = await Usuario.FindAll();
+   }
+
+
+       res.send(resultado);
 });
 
 router.post("/", async (req, res) => {

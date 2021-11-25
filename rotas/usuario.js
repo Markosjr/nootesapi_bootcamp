@@ -24,8 +24,25 @@ router.post("/", async (req, res) => {
 
 });
 
-router.put("/:id",  (req, res) =>{
-   res.send ({});
+router.put("/:id", async (req, res) =>{
+   const {nome, email, senha} = req.body;
+   const {id} = req.params;
+
+   const usuario = await Usuario.update (
+      {
+      nome,
+      email,
+      senha
+   }, 
+   {
+     where: {
+      id,
+     } 
+   }
+   );
+
+   res.send (usuario);
+
 });
 
 router.delete("/:id",  (req, res) =>{

@@ -7,7 +7,17 @@ router.get("/:id?", async (req, res) => {
    let resultado;
 
       if (id) {
-         res.send("Nota ID " + id);
+         resultado = await Nota.findOne({
+            where: {
+               id,
+            },
+            include: [
+               {
+                  model: Usuario,
+                  as: "usuario",
+               },
+            ],
+         });
       } else {
          resultado = await Nota.findAll({
             include: [
@@ -18,9 +28,9 @@ router.get("/:id?", async (req, res) => {
             ],
          });
 
-         res.send(resultado);
+         
       }
-       
+      res.send(resultado);
 });
 
 router.post("/", (req, res) => {

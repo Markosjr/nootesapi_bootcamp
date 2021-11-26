@@ -17,7 +17,7 @@ router.get("/:id?", async (req, res) =>{
       resultado = await Usuario.findByPk(req.params.id);
 
       console.log("Buscando usando findOne");
-      
+
    } else {
       resultado = await Usuario.FindAll();
    }
@@ -47,7 +47,7 @@ router.put("/:id", async (req, res) =>{
    const {nome, email, senha} = req.body;
    const {id} = req.params;
 
-   const usuario = await Usuario.update (
+   await Usuario.update (
       {
       nome,
       email,
@@ -59,6 +59,8 @@ router.put("/:id", async (req, res) =>{
      } 
    }
    );
+
+   const usuario = await Usuario.findByPk(id);
 
    res.send (usuario);
 

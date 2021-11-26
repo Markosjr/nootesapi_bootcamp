@@ -26,6 +26,9 @@ const Usuario = inicializarUsuario(sequelize,DataTypes);
 const Nota = inicializarNota(sequelize,DataTypes);
 const Checklist = inicializarCheckList(sequelize,DataTypes);
 
+Nota.hasMany(Checklist, { as: 'checklist', foreignKey: 'notaId'});
+Nota.belongsTo(Usuario, { as: "usuario", foreignKey: "usuarioId"});
+
 bd ={Usuario, Nota, Checklist};
 
 

@@ -1,13 +1,24 @@
 const {Router} = require("express");
+const {Nota, Usuario} = require("../bd");
 const router = Router();
 
-router.get("/:id?",  (req, res) => {
+router.get("/:id?", async (req, res) => {
    const { id } = req.params;
+   let resultado;
 
       if (id) {
          res.send("Nota ID " + id);
       } else {
-         res.send("Todas as notas");
+         resultado = await Nota.findAll({
+            include: [
+               {
+                  model: Usuario,
+                  as: "usuario",
+               },
+            ],
+         });
+
+         res.send(resultado);
       }
        
 });

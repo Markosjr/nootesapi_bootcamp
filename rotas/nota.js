@@ -1,5 +1,5 @@
 const {Router} = require("express");
-const {Nota, Usuario} = require("../bd");
+const {Nota, Usuario, Checklist, sequelize} = require("../bd");
 const router = Router();
 
 router.get("/:id?", async (req, res) => {
@@ -34,9 +34,49 @@ router.get("/:id?", async (req, res) => {
 });
 
 router.post("/", (req, res) => {
-   res.send("[]");
+   const {usuario, titulo, descricao, checklists} = req.body;
+   const transacao = await sequelize.transaction();
+
+   try {
+      const nota = await Nota.create({
+         usuarioId,
+         titulo,
+         descricao,
+      }, {
+         transaction: transacao,
+      }
+      );
+
+      for (const checklist of checklists) {
+         await Checklist.create(
+            {
+            descricao: checklist.descricao,
+            concluida: checklist.concluida,
+            notaId: nota.id,
+         },
+          {
+            transaction: transacao,
+         }
+         );
+      }
+
+      await transacao.commit();
+
+      res.send(nota);
+
+   } catch (erro) {
+      await transacao.rollback ();
+
+      res.status(500).send({
+         erro,
+      });
+   }
 
 });
+
+   res.send("[]");
+
+
 
 router.put("/:id",  (req, res) => {
    res.send ({});

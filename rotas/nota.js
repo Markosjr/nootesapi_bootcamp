@@ -33,32 +33,39 @@ router.get("/:id?", async (req, res) => {
       res.send(resultado);
 });
 
-router.post("/", (req, res) => {
-   const {usuario, titulo, descricao, checklists} = req.body;
+router.post("/", async (req, res) => {
+   const {usuarioId, titulo, descricao, checklists} = req.body;
    const transacao = await sequelize.transaction();
 
    try {
-      const nota = await Nota.create({
+      let nota = await Nota.create({
          usuarioId,
          titulo,
          descricao,
-      }, {
+      },
+       {
          transaction: transacao,
       }
       );
 
+      let listaCriada = [];
+
       for (const checklist of checklists) {
-         await Checklist.create(
-            {
+        const result = await Checklist.create(
+         {
             descricao: checklist.descricao,
             concluida: checklist.concluida,
             notaId: nota.id,
          },
-          {
+         {
             transaction: transacao,
          }
          );
+        
+         listaCriada.push(result);
       }
+
+      nota.dataValues.checklists = listaCriada;
 
       await transacao.commit();
 
@@ -71,10 +78,10 @@ router.post("/", (req, res) => {
          erro,
       });
    }
-
+   res.send("{}");
 });
 
-   res.send("[]");
+  
 
 
 

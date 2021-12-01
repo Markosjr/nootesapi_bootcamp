@@ -33,4 +33,5 @@ bd ={Usuario, Nota, Checklist};
 
 
 bd.Sequelize = Sequelize;
+bd.sequelize = sequelize;
 module.exports = bd;

@@ -93,8 +93,57 @@ router.post("/", async (req, res) => {
 
 
 
-router.put("/:id",  (req, res) => {
-   res.send ({});
+router.put("/:id", async (req, res) => {
+   const transacao = await sequelize.transaction();
+   const {id} = req.params;
+   const {usuarioId, titulo, descricao, checklists} = req.body;
+   try {
+      await Nota.update(
+      {
+         usuarioId,
+         titulo,
+         descricao
+      }, 
+      {
+         where: {
+            id,
+         },
+         transaction: transacao,
+      }
+      );
+
+      if (checklists && checklists.length > 0) {
+         for (const indice in checklists) {
+            const elemento = checklists[indice];
+            if (elemento.id) {
+               checklists[indice] = await Checklist.update(
+                  {
+                  descricao: elemento.descricao,
+                  concluida: elemento.concluida,
+               },
+                {
+
+                  where: {
+                     id: elemento.id,
+                  },
+                  transaction: transacao,
+               }
+
+               }
+               );
+
+               checklists[indice] = await Checklist.findByPk(elemento.id);
+         }
+
+         nota.dataValues.checklists = checklists;
+         
+         await transacao.commit();
+         res.send();
+      
+   } catch (erro) {
+      await transacao.rollback();
+
+   }
 });
 
 router.delete("/:id", async (req, res) => {

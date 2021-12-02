@@ -1,5 +1,6 @@
 const {Router} = require("express");
 const {Nota, Usuario, Checklist, sequelize} = require("../bd");
+const { getNota } = require("../");
 const router = Router();
 
 router.get("/:id?", async (req, res) => {
@@ -7,21 +8,8 @@ router.get("/:id?", async (req, res) => {
    let resultado;
 
       if (id) {
-         resultado = await Nota.findOne({
-            where: {
-               id,
-            },
-            include: [
-               {
-                  model: Usuario,
-                  as: "usuario",
-               },
-               {
-                  model: Checklist,
-                  as: "checklists",
-               },
-            ],
-         });
+         resultado = await getNota (id);
+      
       } else {
          resultado = await Nota.findAll({
             include: [
@@ -114,65 +102,62 @@ router.put("/:id", async (req, res) => {
 
       if (checklists && checklists.length > 0) {
          for (const indice in checklists) {
-            const elemento = checklists[indice];
-            if (elemento.id) {
-               checklists[indice] = await Checklist.update(
-                  {
-                  descricao: elemento.descricao,
-                  concluida: elemento.concluida,
+           const elemento = checklists[indice];
+   
+           if (elemento.id) {
+             await Checklist.update(
+               {
+                 descricao: elemento.descricao,
+                 concluida: elemento.concluida,
                },
-                {
-
-                  where: {
-                     id: elemento.id,
-                  },
-                  transaction: transacao,
+               {
+                 where: {
+                   id: elemento.id,
+                 },
+                 transaction: transacao,
                }
-
-               }
-               );
-
-               checklists[indice] = await Checklist.findByPk(elemento.id);
+             );
+           }
          }
-
-         nota.dataValues.checklists = checklists;
-         
-         await transacao.commit();
-         res.send();
-      
-   } catch (erro) {
-      await transacao.rollback();
-
-   }
-});
-
-router.delete("/:id", async (req, res) => {
-   const transacao = await sequelize.transaction();
-   const { id } = req.params;
-   try {
-      await checklist.destroy({
+       }
+   
+       await transacao.commit();
+   
+       res.send({ usuarioId, titulo, descricao, checklists });
+     } catch (erro) {
+       await transacao.rollback();
+   
+       res.send({ erro });
+     }
+   });
+   
+   router.delete("/:id", async (req, res) => {
+     const transacao = await sequelize.transaction();
+     const { id } = req.params;
+   
+     try {
+       await Checklist.destroy({
          where: {
-            notaId: id,
+           notaId: id,
          },
          transaction: transacao,
-      });
-
-      await Nota.destroy ({
+       });
+   
+       await Nota.destroy({
          where: {
-            id,
+           id,
          },
          transaction: transacao,
-      });
-
-      await transacao.commit();
-
-      res.send(200);
-   } catch (erro) {
-      await transacao.rollback();
-
-      res.status(500).send({ erro });
-   }
-  
-});
-
-module.exports = router;
+       });
+   
+       await transacao.commit();
+   
+       res.send(200);
+     } catch (erro) {
+       await transacao.rollback();
+   
+       res.status(500).send({ erro });
+     }
+   });
+   
+   module.exports = router;

@@ -1,31 +1,13 @@
 const {Router} = require("express");
 const {Nota, Usuario, Checklist, sequelize} = require("../bd");
-const { getNota } = require("../controle/nota");
+const { getNota, getNotas} = require("../controle/nota");
 const router = Router();
 
 router.get("/:id?", async (req, res) => {
    const { id } = req.params;
-   let resultado;
 
-      if (id) {
-         resultado = await getNota (id);
-      
-      } else {
-         resultado = await Nota.findAll({
-            include: [
-               {
-                  model: Usuario,
-                  as: "usuario",
-               },
-               {
-                  model: Checklist,
-                  as: " checklists",
-               },
-            ],
-         });
+   let resultado = id ? await getNota(id) : await getNotas();
 
-         
-      }
       res.send(resultado);
 });
 
@@ -117,13 +99,26 @@ router.put("/:id", async (req, res) => {
                  transaction: transacao,
                }
              );
+           } else {
+              await Checklist.create ({
+               descricao: elemento.descricao,
+               concluida: elemento.concluida,
+               notaId: elemento.notaId,
+              },
+              {
+               transaction: transacao,
+              }
+              );
            }
          }
        }
+
+       const notaAtualizada = await getNota(id, transacao);
    
        await transacao.commit();
    
-       res.send({ usuarioId, titulo, descricao, checklists });
+       res.send(notaAtualizada);
+
      } catch (erro) {
        await transacao.rollback();
    

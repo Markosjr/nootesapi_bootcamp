@@ -16,6 +16,10 @@ router.get("/:id?", async (req, res) => {
                   model: Usuario,
                   as: "usuario",
                },
+               {
+                  model: Checklist,
+                  as: "checklists",
+               },
             ],
          });
       } else {
@@ -24,6 +28,10 @@ router.get("/:id?", async (req, res) => {
                {
                   model: Usuario,
                   as: "usuario",
+               },
+               {
+                  model: Checklist,
+                  as: " checklists",
                },
             ],
          });
@@ -89,9 +97,33 @@ router.put("/:id",  (req, res) => {
    res.send ({});
 });
 
-router.delete("/:id",  (req, res) => {
-   res.send({});
+router.delete("/:id", async (req, res) => {
+   const transacao = await sequelize.transaction();
+   const { id } = req.params;
+   try {
+      await checklist.destroy({
+         where: {
+            notaId: id,
+         },
+         transaction: transacao,
+      });
 
+      await Nota.destroy ({
+         where: {
+            id,
+         },
+         transaction: transacao,
+      });
+
+      await transacao.commit();
+
+      res.send(200);
+   } catch (erro) {
+      await transacao.rollback();
+
+      res.status(500).send({ erro });
+   }
+  
 });
 
 module.exports = router;

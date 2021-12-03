@@ -3,6 +3,8 @@ const cors = require("cors");
 const app = express();
 const porta = 3000;
 
+
+app.use(cors({ origin: ["https://grupointegrado.com.br"] }));
 app.use(express.json());
 
 const bd = require ("./bd");
@@ -12,6 +14,7 @@ const nota = require ("./rotas/nota");
 
 app.use("/usuario", usuario);
 app.use("/nota", nota);
+
 
 
 app.listen(porta,  () => {
